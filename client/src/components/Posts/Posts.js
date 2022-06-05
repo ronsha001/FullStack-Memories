@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Grid, CircularProgress } from '@material-ui/core'; 
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import Post from './Post/Post';
 import useStyles from './styles';
@@ -8,8 +9,10 @@ import useStyles from './styles';
 export default function Posts({ setCurrentId }) {
     const posts = useSelector((state) => state.posts);
     const classes = useStyles();
+    const navigate = useNavigate()
+    useEffect(() => {
 
-    console.log(posts);
+    }, [navigate])
     
     return (
         !posts.length ? <CircularProgress /> : (
