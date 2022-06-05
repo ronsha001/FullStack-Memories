@@ -36,7 +36,7 @@ const Form = ({ currentId, setCurrentId }) => {
         setCurrentId(null);
         setPostData({ title: '', message: '', tags: '', selectedFile: '' });
     }
-    console.log(user)
+    
     if(!user?.result?.name) {
         return (
             <Paper className={classes.paper}>
