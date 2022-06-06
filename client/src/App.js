@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container } from '@material-ui/core';
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
@@ -9,7 +9,7 @@ import PostDetails from "./components/PostDetails/PostDetails";
 
 const App = () => {
     const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile')));
-    
+
     return (
         <BrowserRouter>
             <Container maxWidth="xl">
