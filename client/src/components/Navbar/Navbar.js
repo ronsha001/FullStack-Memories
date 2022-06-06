@@ -4,11 +4,12 @@ import { useDispatch } from 'react-redux';
 import decode from 'jwt-decode'
 import useStyles from './styles'
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import memories from '../../images/memories.png';
+import memoriesLogo from '../../images/memoriesLogo.png';
+import memoriesText from '../../images/memoriesText.png';
 
-function Navbar() {
+function Navbar({ user, setUser }) {
     const classes = useStyles()
-    const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile')))
+    // const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile')))
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
@@ -36,10 +37,10 @@ function Navbar() {
 
     return (
         <AppBar className={classes.appBar} position="static" color="inherit">
-            <div className={classes.brandContainer}>
-                <Typography component={Link} to ='/' className={classes.heading} variant="h2" align="center">Memories</Typography>
-                <img className={classes.image} src={memories} alt="memories" height="60" />
-            </div>
+            <Link to={'/'} className={classes.brandContainer}>
+                <img src={memoriesText} alt="icon" height="45px" />
+                <img className={classes.image} src={memoriesLogo} alt="memories" height="40px" />
+            </Link>
             <Toolbar className={classes.toolbar}>
                 {user ? (
                     <div className={classes.profile}>
