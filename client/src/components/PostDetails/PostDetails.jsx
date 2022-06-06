@@ -16,15 +16,16 @@ const PostDetails = () => {
 
     useEffect(() => {
         dispatch(getPost(id));
-    }, [id])
+        
+    }, [id]);
 
     useEffect(() => {
         if(post) {
             dispatch(getPostsBySearch({ search: 'none', tags: post?.tags.join(',') }))
         }
-    }, [post])
+    }, [post]);
 
-    if (!posts) return null;
+    if (!post) return null;
 
     if (isLoading) {
         return (
@@ -34,9 +35,14 @@ const PostDetails = () => {
         )
     }
 
-    const recommendedPosts = posts.filter(({ _id }) => _id !== post._id); 
+    console.log(posts);
+    console.log(post._id);
 
-    const openPost = (id) => navigation(`/posts/${id}`);
+    const recommendedPosts = posts.filter(( p ) => p._id !== post._id); 
+
+    console.log(recommendedPosts);
+
+    const openPost = (_id) => {navigation(`/posts/${_id}`)};
 
     return (
         <Paper style={{ padding: '20px', borderRadius: '15px'}} elevation={6}>
