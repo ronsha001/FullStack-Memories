@@ -35,12 +35,7 @@ const PostDetails = () => {
         )
     }
 
-    console.log(posts);
-    console.log(post._id);
-
     const recommendedPosts = posts.filter(( p ) => p._id !== post._id); 
-
-    console.log(recommendedPosts);
 
     const openPost = (_id) => {navigation(`/posts/${_id}`)};
 
