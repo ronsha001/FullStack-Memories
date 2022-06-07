@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { AppBar, Avatar, Button, Toolbar, Typography } from '@material-ui/core'
 import { useDispatch } from 'react-redux';
 import decode from 'jwt-decode'
@@ -9,7 +9,6 @@ import memoriesText from '../../images/memoriesText.png';
 
 function Navbar({ user, setUser }) {
     const classes = useStyles()
-    // const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile')))
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
