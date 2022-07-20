@@ -39,7 +39,7 @@ const PostDetails = () => {
     const recommendedPosts = posts.filter(( p ) => p._id !== post._id); 
 
     const openPost = (_id) => {navigation(`/posts/${_id}`)};
-    const server = "https://mybestmemories.herokuapp.com/";
+
     return (
         <Paper style={{ padding: '20px', borderRadius: '15px'}} elevation={6}>
             <div className={classes.card}>
@@ -56,7 +56,7 @@ const PostDetails = () => {
                     <Divider style={{ margin: '20px 0' }} />
                 </div>
                     <div className={classes.imageSection}>
-                    <img className={classes.media} src={server + post.selectedFile || 'https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png'} alt={post.title} />
+                    <img className={classes.media} src={post.selectedFile || 'https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png'} alt={post.title} />
                 </div>
             </div>
             {recommendedPosts.length && (

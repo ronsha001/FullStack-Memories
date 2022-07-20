@@ -1,9 +1,9 @@
-import path from "path";
-import fs from "fs";
-
 import mongoose from "mongoose";
-import PostMessage from "../models/postMessage.js";
 import express from "express";
+
+import PostMessage from "../models/postMessage.js";
+import { cloudinary } from "../util/cloudinary.js";
+
 const router = express.Router();
 export const getPost = async (req, res) => {
   const { id } = req.params;
@@ -57,21 +57,24 @@ export const getPostsBySearch = async (req, res) => {
 
 export const createPost = async (req, res) => {
   const post = req.body;
-  console.log(post);
-  const newPost = new PostMessage({
-    title: post.title,
-    message: post.message,
-    name: post.name,
-    tags: post.tags.split(','),
-    selectedFile: req.file.path.replace("\\", "/"),
-    creator: req.userId,
-    createdAt: new Date().toISOString(),
-  });
+
   try {
+    const fileStr = post.selectedFile;
+    const uploadedResponse = await cloudinary.uploader.upload(fileStr, {
+      upload_preset: "dev_setups",
+    });
+    // console.log(uploadedResponse);
+    const newPost = new PostMessage({
+      ...post,
+      selectedFile: uploadedResponse.url,
+      creator: req.userId,
+      createdAt: new Date().toISOString(),
+    });
     await newPost.save();
 
     res.status(201).json(newPost);
   } catch (error) {
+    console.log(error);
     res.status(409).json({ message: error.message });
   }
 };
@@ -79,39 +82,61 @@ export const createPost = async (req, res) => {
 export const updatePost = async (req, res) => {
   const { id: _id } = req.params;
   const post = req.body;
-
-  if (!mongoose.Types.ObjectId.isValid(_id))
-    return res.status(404).send("No post with that id");
-  const postToUpdate = await PostMessage.findById(_id);
-  let filePath = postToUpdate.selectedFile;
-  if (req?.file?.path) {
-    filePath = req.file.path.replace("\\", "/");
-    clearImage(postToUpdate.selectedFile);
+  try {
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      return res.status(404).send("No post with that id");
+    }
+    const postToUpdate = await PostMessage.findById(_id);
+    postToUpdate.title = post.title;
+    postToUpdate.message = post.message;
+    postToUpdate.tags = post.tags;
+    if (post.selectedFile) {
+      // Delete the old file
+      // the URL: https://res.cloudinary.com/djhbfnaz0/image/upload/v1658323985/tycxbzk2yckn8cwyn0j7.png
+      let public_id = postToUpdate.selectedFile.split("/");
+      public_id = public_id[public_id.length - 1].split(".")[0];
+      await cloudinary.uploader.destroy(public_id, function (result) {
+        // console.log(result);
+      });
+      // Upload new file
+      const fileStr = post.selectedFile;
+      const uploadedResponse = await cloudinary.uploader.upload(fileStr, {
+        upload_preset: "dev_setups",
+      });
+      postToUpdate.selectedFile = uploadedResponse.url;
+    }
+    await postToUpdate.save();
+    res.json(postToUpdate);
+  } catch (err) {
+    console.log(err);
+    res.status(404).json({ message: "Failed to update." });
   }
-  postToUpdate.title = post.title;
-  postToUpdate.message = post.message;
-  postToUpdate.name = post.name;
-  postToUpdate.tags = post.tags.split(',');
-  postToUpdate.selectedFile = filePath;
-  await postToUpdate.save();
-
-  res.json(postToUpdate);
 };
 
 export const deletePost = async (req, res) => {
   const { id } = req.params;
 
-  if (!mongoose.Types.ObjectId.isValid(id))
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(404).send("No post with that id");
-
-  const post = await PostMessage.findById(id);
-  if (post.selectedFile) {
-    clearImage(post.selectedFile);
   }
+  try {
+    const postToDelete = await PostMessage.findById(id);
+    if (postToDelete.selectedFile) {
+      // Delete file if existing
+      // the URL: https://res.cloudinary.com/djhbfnaz0/image/upload/v1658323985/tycxbzk2yckn8cwyn0j7.png
+      let public_id = postToDelete.selectedFile.split("/");
+      public_id = public_id[public_id.length - 1].split(".")[0];
+      await cloudinary.uploader.destroy(public_id, function (result) {
+        // console.log(result);
+      });
+    }
+    await PostMessage.findByIdAndDelete(id);
 
-  await PostMessage.findByIdAndRemove(id);
-
-  res.json({ message: "Post deleted successfully" });
+    res.json({ message: "Post deleted successfully" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Deletion failed." });
+  }
 };
 
 export const likePost = async (req, res) => {
@@ -154,12 +179,6 @@ export const commentPost = async (req, res) => {
   });
 
   res.json(updatedPost);
-};
-
-const clearImage = (filePath) => {
-  const __dirname = path.dirname("");
-  filePath = path.join(__dirname, filePath);
-  fs.unlink(filePath, (err) => console.log(err));
 };
 
 export default router;

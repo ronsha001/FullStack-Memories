@@ -48,11 +48,11 @@ export default function Post({ post, setCurrentId }) {
     }
 
     const openPost = () => navigate(`/posts/${post._id}`);
-    const server = "https://mybestmemories.herokuapp.com/";
+
     return (
         <Card className={classes.card} raised elevation={6} >
             <div style={{cursor: 'pointer'}} onClick={openPost} >
-                <CardMedia className={classes.media} image={server+post.selectedFile} title={post.title} />
+                <CardMedia className={classes.media} image={post.selectedFile} title={post.title} />
                 <div className={classes.overlay}>
                     <Typography variant='h6'>{post.name}</Typography>
                     <Typography variant='body2'>{moment(post.createdAt).fromNow()}</Typography>
